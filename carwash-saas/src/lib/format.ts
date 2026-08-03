@@ -11,7 +11,8 @@ export function toNumber(value: DecimalLike): number {
 const localeMap: Record<string, string> = {
   tr: 'tr-TR',
   en: 'en-US',
-  es: 'es-ES'
+  es: 'es-ES',
+  uk: 'uk-UA'
 };
 
 export function formatMoney(
