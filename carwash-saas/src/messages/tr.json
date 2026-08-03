@@ -50,7 +50,8 @@
     "password": "Şifre",
     "signIn": "Giriş Yap",
     "invalid": "E-posta veya şifre hatalı",
-    "welcome": "Tekrar hoş geldiniz"
+    "welcome": "Tekrar hoş geldiniz",
+    "accountInactive": "Hesabınız pasif veya aboneliğinizin süresi dolmuş. Lütfen sistem yöneticisiyle görüşün."
   },
   "dashboard": {
     "title": "Panel",
@@ -186,7 +187,24 @@
     "empty": "Henüz işletme oluşturulmadı",
     "select": "Seç",
     "selected": "Seçili",
-    "activeBusiness": "Aktif işletme"
+    "activeBusiness": "Aktif işletme",
+    "passive": "Pasif",
+    "expired": "Süresi doldu",
+    "plan": "Plan",
+    "subscription": "Abonelik",
+    "subscriptionEnds": "Abonelik bitişi",
+    "unlimited": "Süresiz",
+    "unlimitedHint": "Boş bırakılırsa abonelik süresiz olur.",
+    "todayWashes": "Bugünkü yıkama",
+    "monthRevenue": "Aylık ciro",
+    "activate": "Aktifleştir",
+    "deactivate": "Pasifleştir",
+    "resetOwnerPassword": "Sahip şifresini sıfırla",
+    "newPassword": "Yeni şifre",
+    "totalBusinesses": "Toplam işletme",
+    "activeBusinesses": "Aktif işletme",
+    "expiringSoon": "Süresi yakında dolacak",
+    "byBusiness": "İşletme bazında"
   },
   "booking": {
     "title": "Online Randevu",

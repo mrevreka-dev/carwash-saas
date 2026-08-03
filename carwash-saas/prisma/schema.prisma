@@ -111,6 +111,9 @@ model Business {
   timezone   String   @default("Europe/Istanbul")
   logoUrl    String?
   isActive   Boolean  @default(true)
+  // SaaS subscription controls (managed by the platform SUPER_ADMIN)
+  plan               String    @default("standard")
+  subscriptionEndsAt DateTime? // null = no expiry (unlimited)
 
   members       User[]         @relation("BusinessMembers")
   customers     Customer[]

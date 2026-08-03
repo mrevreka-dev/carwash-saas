@@ -1,12 +1,21 @@
+import type { CSSProperties } from 'react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
 import { getPageContext } from '@/lib/page-context';
 import { getFinanceSummary } from '@/lib/services/finance';
-import { formatMoney, formatDateTime } from '@/lib/format';
+import { getOperatorOverview, type BusinessStatus } from '@/lib/services/operator';
+import { formatMoney, formatDateTime, formatDate } from '@/lib/format';
+import { Link } from '@/i18n/navigation';
 import PageHeader from '@/components/PageHeader';
 import StatCard from '@/components/StatCard';
 import StatusBadge from '@/components/StatusBadge';
 import NoBusiness from '@/components/NoBusiness';
+
+const STATUS_STYLE: Record<BusinessStatus, CSSProperties> = {
+  ACTIVE: { background: '#dcfce7', color: '#166534' },
+  PASSIVE: { background: '#f1f5f9', color: '#475569' },
+  EXPIRED: { background: '#fee2e2', color: '#991b1b' }
+};
 
 export default async function DashboardPage({
   params
@@ -17,8 +26,76 @@ export default async function DashboardPage({
   setRequestLocale(locale);
   const { businessId, session } = await getPageContext(locale);
   const t = await getTranslations('dashboard');
+  const tb = await getTranslations('business');
+  const tc = await getTranslations('common');
   const tStatus = await getTranslations('status');
 
+  // ---- SUPER_ADMIN: platform operator dashboard ----
+  if (session.role === 'SUPER_ADMIN') {
+    const ov = await getOperatorOverview();
+    const currency = ov.rows[0]?.business.currency ?? 'TRY';
+    const statusLabel = (s: BusinessStatus) =>
+      s === 'ACTIVE' ? tc('active') : s === 'PASSIVE' ? tb('passive') : tb('expired');
+
+    return (
+      <div className="space-y-6">
+        <PageHeader title={t('title')} subtitle={t('welcome', { name: session.name })} />
+
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+          <StatCard label={tb('totalBusinesses')} value={ov.totalBusinesses} accent="brand" />
+          <StatCard label={tb('activeBusinesses')} value={ov.activeBusinesses} accent="green" />
+          <StatCard label={tb('todayWashes')} value={ov.todayWashesTotal} />
+          <StatCard label={tb('monthRevenue')} value={formatMoney(ov.monthRevenueTotal, currency, locale)} accent="green" />
+        </div>
+
+        <div className="card overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 font-semibold text-sm flex items-center justify-between">
+            <span>{tb('byBusiness')}</span>
+            <Link href="/businesses" className="text-brand-600 text-xs">
+              {tb('title')} →
+            </Link>
+          </div>
+          <table className="data">
+            <thead>
+              <tr>
+                <th>{tb('name')}</th>
+                <th>{tc('status')}</th>
+                <th>{tb('subscriptionEnds')}</th>
+                <th>{tb('todayWashes')}</th>
+                <th>{tb('monthRevenue')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ov.rows.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="text-center text-slate-400 py-8">
+                    {tb('empty')}
+                  </td>
+                </tr>
+              )}
+              {ov.rows.map(({ business: b, status, todayWashes, monthRevenue }) => (
+                <tr key={b.id}>
+                  <td className="font-semibold">{b.name}</td>
+                  <td>
+                    <span className="badge" style={STATUS_STYLE[status]}>
+                      {statusLabel(status)}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap">
+                    {b.subscriptionEndsAt ? formatDate(b.subscriptionEndsAt, locale) : tb('unlimited')}
+                  </td>
+                  <td className="font-semibold">{todayWashes}</td>
+                  <td className="font-medium">{formatMoney(monthRevenue, b.currency, locale)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  // ---- OWNER / STAFF: single-business operational dashboard ----
   if (!businessId) return <NoBusiness />;
   const bId = businessId;
 
@@ -29,7 +106,7 @@ export default async function DashboardPage({
 
   const [business, summary, todayCount, customerCount, employeeCount, upcoming, recentTxns] =
     await Promise.all([
-      prisma.business.findUnique({ where: { id: bId }, select: { currency: true, name: true } }),
+      prisma.business.findUnique({ where: { id: bId }, select: { currency: true } }),
       getFinanceSummary(bId, monthStart),
       prisma.appointment.count({
         where: { businessId: bId, startAt: { gte: dayStart, lt: dayEnd } }

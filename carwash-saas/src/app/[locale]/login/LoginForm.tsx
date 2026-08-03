@@ -44,7 +44,9 @@ export default function LoginForm({ locale }: { locale: string }) {
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-600 font-medium">{t('invalid')}</p>
+        <p className="text-sm text-red-600 font-medium">
+          {state.error === 'inactive' ? t('accountInactive') : t('invalid')}
+        </p>
       )}
 
       <button type="submit" className="btn btn-primary w-full justify-center" disabled={pending}>

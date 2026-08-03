@@ -50,7 +50,8 @@
     "password": "Password",
     "signIn": "Sign In",
     "invalid": "Invalid email or password",
-    "welcome": "Welcome back"
+    "welcome": "Welcome back",
+    "accountInactive": "Your account is inactive or your subscription has expired. Please contact the system administrator."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -186,7 +187,24 @@
     "empty": "No businesses yet",
     "select": "Select",
     "selected": "Selected",
-    "activeBusiness": "Active business"
+    "activeBusiness": "Active business",
+    "passive": "Passive",
+    "expired": "Expired",
+    "plan": "Plan",
+    "subscription": "Subscription",
+    "subscriptionEnds": "Subscription ends",
+    "unlimited": "Unlimited",
+    "unlimitedHint": "Leave empty for an unlimited subscription.",
+    "todayWashes": "Today's washes",
+    "monthRevenue": "Monthly revenue",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "resetOwnerPassword": "Reset owner password",
+    "newPassword": "New password",
+    "totalBusinesses": "Total businesses",
+    "activeBusinesses": "Active businesses",
+    "expiringSoon": "Expiring soon",
+    "byBusiness": "By business"
   },
   "booking": {
     "title": "Online Booking",

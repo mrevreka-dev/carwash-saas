@@ -50,7 +50,8 @@
     "password": "Пароль",
     "signIn": "Увійти",
     "invalid": "Невірна пошта або пароль",
-    "welcome": "З поверненням"
+    "welcome": "З поверненням",
+    "accountInactive": "Ваш обліковий запис неактивний або термін підписки закінчився. Зверніться до адміністратора системи."
   },
   "dashboard": {
     "title": "Панель",
@@ -186,7 +187,24 @@
     "empty": "Бізнесів ще немає",
     "select": "Обрати",
     "selected": "Обрано",
-    "activeBusiness": "Активний бізнес"
+    "activeBusiness": "Активний бізнес",
+    "passive": "Неактивний",
+    "expired": "Термін минув",
+    "plan": "Тариф",
+    "subscription": "Підписка",
+    "subscriptionEnds": "Кінець підписки",
+    "unlimited": "Безстроково",
+    "unlimitedHint": "Залиште порожнім для безстрокової підписки.",
+    "todayWashes": "Мийок сьогодні",
+    "monthRevenue": "Дохід за місяць",
+    "activate": "Активувати",
+    "deactivate": "Деактивувати",
+    "resetOwnerPassword": "Скинути пароль власника",
+    "newPassword": "Новий пароль",
+    "totalBusinesses": "Усього бізнесів",
+    "activeBusinesses": "Активні бізнеси",
+    "expiringSoon": "Скоро закінчиться",
+    "byBusiness": "За бізнесом"
   },
   "booking": {
     "title": "Онлайн-запис",

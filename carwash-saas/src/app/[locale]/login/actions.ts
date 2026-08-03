@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { verifyPassword, createSession } from '@/lib/auth';
+import { canBusinessLogin } from '@/lib/services/operator';
 import { loginSchema } from '@/lib/validation';
 
 export interface LoginState {
@@ -32,6 +33,17 @@ export async function loginAction(
   const ok = await verifyPassword(parsed.data.password, user.passwordHash);
   if (!ok) {
     return { error: 'invalid' };
+  }
+
+  // Gate owners/staff whose business is passive or past its subscription date.
+  if (user.role !== 'SUPER_ADMIN' && user.businessId) {
+    const business = await prisma.business.findUnique({
+      where: { id: user.businessId },
+      select: { isActive: true, subscriptionEndsAt: true }
+    });
+    if (!business || !canBusinessLogin(business)) {
+      return { error: 'inactive' };
+    }
   }
 
   await createSession({

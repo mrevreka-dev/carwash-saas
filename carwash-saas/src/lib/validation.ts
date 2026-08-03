@@ -26,21 +26,45 @@ export const loginSchema = z.object({
   password: z.string().min(1)
 });
 
+const slugField = z
+  .string()
+  .trim()
+  .min(2)
+  .regex(/^[a-z0-9-]+$/, 'lowercase letters, numbers and dashes only');
+
 export const businessSchema = z.object({
   name: z.string().trim().min(2),
-  slug: z
-    .string()
-    .trim()
-    .min(2)
-    .regex(/^[a-z0-9-]+$/, 'lowercase letters, numbers and dashes only'),
+  slug: slugField,
   email: optionalString,
   phone: optionalString,
   address: optionalString,
   city: optionalString,
   currency: z.string().trim().default('TRY'),
+  plan: z.string().trim().default('standard'),
+  subscriptionEndsAt: optionalString,
   ownerName: z.string().trim().min(2),
   ownerEmail: z.string().trim().email(),
   ownerPassword: z.string().min(6)
+});
+
+// SUPER_ADMIN editing an existing business (no owner-account fields)
+export const businessUpdateSchema = z.object({
+  name: z.string().trim().min(2),
+  slug: slugField,
+  email: optionalString,
+  phone: optionalString,
+  address: optionalString,
+  city: optionalString,
+  currency: z.string().trim().default('TRY'),
+  plan: z.string().trim().default('standard')
+});
+
+export const subscriptionSchema = z.object({
+  subscriptionEndsAt: optionalString // empty => unlimited
+});
+
+export const ownerPasswordResetSchema = z.object({
+  newPassword: z.string().min(6)
 });
 
 export const customerSchema = z.object({

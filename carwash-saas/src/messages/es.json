@@ -50,7 +50,8 @@
     "password": "Contraseña",
     "signIn": "Iniciar sesión",
     "invalid": "Correo o contraseña incorrectos",
-    "welcome": "Bienvenido de nuevo"
+    "welcome": "Bienvenido de nuevo",
+    "accountInactive": "Tu cuenta está inactiva o tu suscripción ha caducado. Contacta con el administrador del sistema."
   },
   "dashboard": {
     "title": "Panel",
@@ -186,7 +187,24 @@
     "empty": "Aún no hay negocios",
     "select": "Seleccionar",
     "selected": "Seleccionado",
-    "activeBusiness": "Negocio activo"
+    "activeBusiness": "Negocio activo",
+    "passive": "Inactivo",
+    "expired": "Caducado",
+    "plan": "Plan",
+    "subscription": "Suscripción",
+    "subscriptionEnds": "Fin de suscripción",
+    "unlimited": "Ilimitado",
+    "unlimitedHint": "Déjalo vacío para una suscripción ilimitada.",
+    "todayWashes": "Lavados de hoy",
+    "monthRevenue": "Ingresos del mes",
+    "activate": "Activar",
+    "deactivate": "Desactivar",
+    "resetOwnerPassword": "Restablecer contraseña del propietario",
+    "newPassword": "Nueva contraseña",
+    "totalBusinesses": "Total de negocios",
+    "activeBusinesses": "Negocios activos",
+    "expiringSoon": "Caduca pronto",
+    "byBusiness": "Por negocio"
   },
   "booking": {
     "title": "Reserva Online",
