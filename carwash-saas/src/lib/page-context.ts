@@ -17,3 +17,14 @@ export async function getPageContext(locale: string): Promise<PageContext> {
   const businessId = await getActiveBusinessId(session);
   return { session, businessId, locale };
 }
+
+/**
+ * Context for tenant-scoped operational pages (customers, appointments,
+ * finance, …). The platform SUPER_ADMIN has no operational role inside a single
+ * tenant, so they are redirected to the operator console.
+ */
+export async function guardTenantPage(locale: string): Promise<PageContext> {
+  const ctx = await getPageContext(locale);
+  if (ctx.session.role === 'SUPER_ADMIN') redirect(`/${locale}/businesses`);
+  return ctx;
+}

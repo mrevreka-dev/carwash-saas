@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
-import { getPageContext } from '@/lib/page-context';
+import { guardTenantPage } from '@/lib/page-context';
 import { formatMoney } from '@/lib/format';
 import PageHeader from '@/components/PageHeader';
 import FormPanel, { Field } from '@/components/FormPanel';
@@ -19,7 +19,7 @@ export default async function ServicesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { businessId } = await getPageContext(locale);
+  const { businessId } = await guardTenantPage(locale);
   const t = await getTranslations('services');
   const tc = await getTranslations('common');
 

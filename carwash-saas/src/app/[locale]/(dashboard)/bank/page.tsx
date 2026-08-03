@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
-import { getPageContext } from '@/lib/page-context';
+import { guardTenantPage } from '@/lib/page-context';
 import { getBankAccountBalance } from '@/lib/services/finance';
 import { formatMoney, formatDate } from '@/lib/format';
 import PageHeader from '@/components/PageHeader';
@@ -21,7 +21,7 @@ export default async function BankPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { businessId } = await getPageContext(locale);
+  const { businessId } = await guardTenantPage(locale);
   const t = await getTranslations('bank');
   const tc = await getTranslations('common');
 

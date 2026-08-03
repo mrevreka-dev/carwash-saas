@@ -204,7 +204,9 @@
     "totalBusinesses": "Total de negocios",
     "activeBusinesses": "Negocios activos",
     "expiringSoon": "Caduca pronto",
-    "byBusiness": "Por negocio"
+    "byBusiness": "Por negocio",
+    "detail": "Detalles",
+    "totalAppointments": "Citas totales"
   },
   "booking": {
     "title": "Reserva Online",

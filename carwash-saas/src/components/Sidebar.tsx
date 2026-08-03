@@ -12,15 +12,17 @@ interface NavItem {
 }
 
 const ITEMS: NavItem[] = [
+  // SUPER_ADMIN (platform operator) sees only the operator console:
   { href: '/dashboard', key: 'dashboard', roles: ['SUPER_ADMIN', 'OWNER', 'STAFF'], icon: '▤' },
   { href: '/businesses', key: 'businesses', roles: ['SUPER_ADMIN'], icon: '◆' },
-  { href: '/appointments', key: 'appointments', roles: ['SUPER_ADMIN', 'OWNER', 'STAFF'], icon: '◷' },
-  { href: '/customers', key: 'customers', roles: ['SUPER_ADMIN', 'OWNER', 'STAFF'], icon: '☺' },
-  { href: '/vehicles', key: 'vehicles', roles: ['SUPER_ADMIN', 'OWNER', 'STAFF'], icon: '⛟' },
-  { href: '/services', key: 'services', roles: ['SUPER_ADMIN', 'OWNER'], icon: '≡' },
-  { href: '/employees', key: 'employees', roles: ['SUPER_ADMIN', 'OWNER'], icon: '⚇' },
-  { href: '/finance', key: 'finance', roles: ['SUPER_ADMIN', 'OWNER', 'STAFF'], icon: '₺' },
-  { href: '/bank', key: 'bank', roles: ['SUPER_ADMIN', 'OWNER'], icon: '▦' }
+  // Tenant-scoped operational modules — owners & staff only:
+  { href: '/appointments', key: 'appointments', roles: ['OWNER', 'STAFF'], icon: '◷' },
+  { href: '/customers', key: 'customers', roles: ['OWNER', 'STAFF'], icon: '☺' },
+  { href: '/vehicles', key: 'vehicles', roles: ['OWNER', 'STAFF'], icon: '⛟' },
+  { href: '/services', key: 'services', roles: ['OWNER'], icon: '≡' },
+  { href: '/employees', key: 'employees', roles: ['OWNER'], icon: '⚇' },
+  { href: '/finance', key: 'finance', roles: ['OWNER', 'STAFF'], icon: '₺' },
+  { href: '/bank', key: 'bank', roles: ['OWNER'], icon: '▦' }
 ];
 
 export default function Sidebar({ role }: { role: Role }) {

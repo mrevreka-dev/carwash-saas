@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
-import { getPageContext } from '@/lib/page-context';
+import { guardTenantPage } from '@/lib/page-context';
 import { getFinanceSummary } from '@/lib/services/finance';
 import { formatMoney, formatDate } from '@/lib/format';
 import { can } from '@/lib/rbac';
@@ -29,7 +29,7 @@ export default async function FinancePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { businessId, session } = await getPageContext(locale);
+  const { businessId, session } = await guardTenantPage(locale);
   const t = await getTranslations('finance');
   const tc = await getTranslations('common');
   const tMethod = await getTranslations('method');

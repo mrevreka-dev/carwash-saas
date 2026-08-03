@@ -204,7 +204,9 @@
     "totalBusinesses": "Усього бізнесів",
     "activeBusinesses": "Активні бізнеси",
     "expiringSoon": "Скоро закінчиться",
-    "byBusiness": "За бізнесом"
+    "byBusiness": "За бізнесом",
+    "detail": "Деталі",
+    "totalAppointments": "Усього записів"
   },
   "booking": {
     "title": "Онлайн-запис",

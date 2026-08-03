@@ -204,7 +204,9 @@
     "totalBusinesses": "Toplam işletme",
     "activeBusinesses": "Aktif işletme",
     "expiringSoon": "Süresi yakında dolacak",
-    "byBusiness": "İşletme bazında"
+    "byBusiness": "İşletme bazında",
+    "detail": "Detay",
+    "totalAppointments": "Toplam randevu"
   },
   "booking": {
     "title": "Online Randevu",

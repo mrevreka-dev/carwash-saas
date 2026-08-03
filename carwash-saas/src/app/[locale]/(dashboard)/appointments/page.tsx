@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { AppointmentStatus } from '@prisma/client';
 import { prisma } from '@/lib/db';
-import { getPageContext } from '@/lib/page-context';
+import { guardTenantPage } from '@/lib/page-context';
 import { formatMoney, formatDateTime, toDateTimeLocal } from '@/lib/format';
 import PageHeader from '@/components/PageHeader';
 import FormPanel, { Field } from '@/components/FormPanel';
@@ -35,7 +35,7 @@ export default async function AppointmentsPage({
   const { locale } = await params;
   const { status: statusFilter } = await searchParams;
   setRequestLocale(locale);
-  const { businessId } = await getPageContext(locale);
+  const { businessId } = await guardTenantPage(locale);
   const t = await getTranslations('appointments');
   const tc = await getTranslations('common');
   const tStatus = await getTranslations('status');

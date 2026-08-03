@@ -204,7 +204,9 @@
     "totalBusinesses": "Total businesses",
     "activeBusinesses": "Active businesses",
     "expiringSoon": "Expiring soon",
-    "byBusiness": "By business"
+    "byBusiness": "By business",
+    "detail": "Details",
+    "totalAppointments": "Total appointments"
   },
   "booking": {
     "title": "Online Booking",

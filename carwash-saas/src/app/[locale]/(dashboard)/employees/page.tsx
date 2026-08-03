@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { prisma } from '@/lib/db';
-import { getPageContext } from '@/lib/page-context';
+import { guardTenantPage } from '@/lib/page-context';
 import { formatMoney, formatDate } from '@/lib/format';
 import { can } from '@/lib/rbac';
 import PageHeader from '@/components/PageHeader';
@@ -21,7 +21,7 @@ export default async function EmployeesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { businessId, session } = await getPageContext(locale);
+  const { businessId, session } = await guardTenantPage(locale);
   const t = await getTranslations('employees');
   const tc = await getTranslations('common');
 

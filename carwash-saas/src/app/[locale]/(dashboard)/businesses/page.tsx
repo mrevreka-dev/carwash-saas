@@ -8,7 +8,7 @@ import PageHeader from '@/components/PageHeader';
 import StatCard from '@/components/StatCard';
 import FormPanel, { Field } from '@/components/FormPanel';
 import DeleteForm from '@/components/DeleteForm';
-import { setActiveBusinessAction } from '@/lib/session-actions';
+import { Link } from '@/i18n/navigation';
 import {
   createBusinessAction,
   updateBusinessAction,
@@ -35,7 +35,7 @@ export default async function BusinessesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const { session, businessId } = await getPageContext(locale);
+  const { session } = await getPageContext(locale);
   if (session.role !== 'SUPER_ADMIN') redirect(`/${locale}/dashboard`);
 
   const t = await getTranslations('business');
@@ -118,7 +118,6 @@ export default async function BusinessesPage({
             )}
             {ov.rows.map(({ business: b, status, ownerEmail, todayWashes, monthRevenue }) => {
               const link = `${appUrl}/${locale}/book/${b.slug}`;
-              const isActive = b.id === businessId;
               return (
                 <tr key={b.id}>
                   <td>
@@ -140,11 +139,9 @@ export default async function BusinessesPage({
                   <td className="font-semibold">{todayWashes}</td>
                   <td className="font-medium">{formatMoney(monthRevenue, b.currency, locale)}</td>
                   <td className="text-right whitespace-nowrap space-x-1">
-                    <form action={setActiveBusinessAction.bind(null, b.id)} style={{ display: 'inline' }}>
-                      <button className={`btn ${isActive ? 'btn-primary' : 'btn-ghost'}`} style={{ padding: '0.3rem 0.6rem' }}>
-                        {isActive ? t('selected') : t('select')}
-                      </button>
-                    </form>
+                    <Link href={`/businesses/${b.id}`} className="btn btn-ghost" style={{ padding: '0.3rem 0.6rem' }}>
+                      {t('detail')}
+                    </Link>
                     <form action={toggleBusinessActiveAction} style={{ display: 'inline' }}>
                       <input type="hidden" name="id" value={b.id} />
                       <button className="btn btn-ghost" style={{ padding: '0.3rem 0.6rem' }}>

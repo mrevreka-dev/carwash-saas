@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { getSession } from '@/lib/auth';
-import { getActiveBusinessId } from '@/lib/tenant';
 import { prisma } from '@/lib/db';
 import { canBusinessLogin } from '@/lib/services/operator';
 import { logoutAction } from '@/lib/session-actions';
@@ -48,25 +47,11 @@ export default async function DashboardLayout({
     }
   }
 
-  const businesses = isSuperAdmin
-    ? await prisma.business.findMany({
-        orderBy: { name: 'asc' },
-        select: { id: true, name: true }
-      })
-    : [];
-  const activeBusinessId = await getActiveBusinessId(session);
-
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar role={session.role} />
       <div className="flex-1 min-w-0 flex flex-col">
-        <Topbar
-          name={session.name}
-          roleLabel={tRole(session.role)}
-          isSuperAdmin={isSuperAdmin}
-          businesses={businesses}
-          activeBusinessId={activeBusinessId}
-        />
+        <Topbar name={session.name} roleLabel={tRole(session.role)} />
         <main className="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto">{children}</main>
       </div>
     </div>
