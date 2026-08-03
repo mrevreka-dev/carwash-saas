@@ -1,0 +1,347 @@
+// Car Wash Management SaaS — data model
+// Multi-tenant: a Business (işletme) is the tenant boundary. Every operational
+// record carries a businessId. A SUPER_ADMIN owns the platform and creates
+// businesses; each business has an OWNER who assigns STAFF.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  SUPER_ADMIN // platform owner — manages all businesses
+  OWNER // owner of a single business
+  STAFF // employee of a single business with limited access
+}
+
+enum AppointmentStatus {
+  PENDING // requested (e.g. online), awaiting confirmation
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentSource {
+  ONLINE // created through the public booking page
+  MANUAL // created by staff in the panel
+}
+
+enum VehicleType {
+  MOTORCYCLE
+  SEDAN
+  HATCHBACK
+  SUV
+  VAN
+  TRUCK
+  OTHER
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  BANK_TRANSFER
+  OTHER
+}
+
+enum ExpenseCategory {
+  SALARY
+  RENT
+  UTILITIES
+  SUPPLIES
+  MAINTENANCE
+  MARKETING
+  TAX
+  OTHER
+}
+
+enum BankTxnDirection {
+  IN // money into the account (deposit)
+  OUT // money out of the account (withdrawal)
+}
+
+// ---------------------------------------------------------------------------
+// Identity & tenancy
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(STAFF)
+  locale       String   @default("tr")
+  isActive     Boolean  @default(true)
+  // null for SUPER_ADMIN; set for OWNER / STAFF
+  businessId   String?
+  business     Business? @relation("BusinessMembers", fields: [businessId], references: [id], onDelete: Cascade)
+
+  employee     Employee?
+  createdTxns  Transaction[] @relation("TxnCreatedBy")
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+model Business {
+  id         String   @id @default(cuid())
+  name       String
+  slug       String   @unique // used for the public booking URL
+  email      String?
+  phone      String?
+  address    String?
+  city       String?
+  currency   String   @default("TRY")
+  timezone   String   @default("Europe/Istanbul")
+  logoUrl    String?
+  isActive   Boolean  @default(true)
+
+  members       User[]         @relation("BusinessMembers")
+  customers     Customer[]
+  vehicles      Vehicle[]
+  services      Service[]
+  employees     Employee[]
+  appointments  Appointment[]
+  transactions  Transaction[]
+  bankAccounts  BankAccount[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// CRM
+// ---------------------------------------------------------------------------
+
+model Customer {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  firstName  String
+  lastName   String?
+  phone      String?
+  email      String?
+  notes      String?
+
+  vehicles     Vehicle[]
+  appointments Appointment[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
+  @@index([businessId, phone])
+}
+
+model Vehicle {
+  id         String      @id @default(cuid())
+  businessId String
+  business   Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customerId String?
+  customer   Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  plate      String
+  make       String?
+  model      String?
+  color      String?
+  type       VehicleType @default(SEDAN)
+
+  appointments Appointment[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
+  @@index([businessId, plate])
+}
+
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+
+model Service {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  durationMin Int      @default(30)
+  price       Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+
+  appointments Appointment[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+// ---------------------------------------------------------------------------
+// HR — employees are business records; optionally linked to a login User
+// ---------------------------------------------------------------------------
+
+model Employee {
+  id            String   @id @default(cuid())
+  businessId    String
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  firstName     String
+  lastName      String?
+  phone         String?
+  email         String?
+  position      String?
+  monthlySalary Decimal  @default(0) @db.Decimal(10, 2)
+  hireDate      DateTime?
+  isActive      Boolean  @default(true)
+
+  // optional link to a login account
+  userId        String?  @unique
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  appointments  Appointment[]
+  transactions  Transaction[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+// ---------------------------------------------------------------------------
+// Scheduling
+// ---------------------------------------------------------------------------
+
+model Appointment {
+  id          String            @id @default(cuid())
+  businessId  String
+  business    Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  customerId  String?
+  customer    Customer?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  vehicleId   String?
+  vehicle     Vehicle?          @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  serviceId   String?
+  service     Service?          @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  employeeId  String?
+  employee    Employee?         @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+
+  // captured contact for online bookings that do not yet have a Customer
+  contactName  String?
+  contactPhone String?
+
+  startAt     DateTime
+  endAt       DateTime
+  status      AppointmentStatus @default(PENDING)
+  source      AppointmentSource @default(MANUAL)
+  price       Decimal?          @db.Decimal(10, 2)
+  notes       String?
+
+  transactions Transaction[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
+  @@index([businessId, startAt])
+  @@index([businessId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Finance — unified ledger for income and expenses
+// ---------------------------------------------------------------------------
+
+model Transaction {
+  id            String           @id @default(cuid())
+  businessId    String
+  business      Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  type          TransactionType
+  amount        Decimal          @db.Decimal(12, 2)
+  method        PaymentMethod    @default(CASH)
+  category      ExpenseCategory? // used for expenses
+  description   String?
+  occurredAt    DateTime         @default(now())
+
+  // optional links
+  appointmentId String?
+  appointment   Appointment?     @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  employeeId    String? // e.g. salary payment
+  employee      Employee?        @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  bankAccountId String?
+  bankAccount   BankAccount?     @relation(fields: [bankAccountId], references: [id], onDelete: SetNull)
+
+  createdById   String?
+  createdBy     User?            @relation("TxnCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
+  @@index([businessId, type])
+  @@index([businessId, occurredAt])
+}
+
+// ---------------------------------------------------------------------------
+// Banking
+// ---------------------------------------------------------------------------
+
+model BankAccount {
+  id             String   @id @default(cuid())
+  businessId     String
+  business       Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  name           String
+  bankName       String?
+  iban           String?
+  currency       String   @default("TRY")
+  openingBalance Decimal  @default(0) @db.Decimal(12, 2)
+  isActive       Boolean  @default(true)
+
+  bankTransactions BankTransaction[]
+  transactions     Transaction[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
+}
+
+model BankTransaction {
+  id            String           @id @default(cuid())
+  businessId    String
+  bankAccountId String
+  bankAccount   BankAccount      @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  direction     BankTxnDirection
+  amount        Decimal          @db.Decimal(12, 2)
+  description   String?
+  counterparty  String?
+  reference     String?
+  occurredAt    DateTime         @default(now())
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([businessId])
+  @@index([bankAccountId])
+  @@index([bankAccountId, occurredAt])
+}

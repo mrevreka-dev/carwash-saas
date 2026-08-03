@@ -1,0 +1,12 @@
+# Nixpacks configuration for Railway.
+# Node 20 is used; Prisma client is generated during the build (postinstall
+# also runs `prisma generate`).
+
+[phases.setup]
+nixPkgs = ["nodejs_20", "openssl"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npx prisma db push --skip-generate --accept-data-loss && npm run start"
