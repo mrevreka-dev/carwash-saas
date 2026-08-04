@@ -6,8 +6,9 @@ import { getOperatorOverview, type BusinessStatus } from '@/lib/services/operato
 import { formatMoney, formatDate } from '@/lib/format';
 import PageHeader from '@/components/PageHeader';
 import StatCard from '@/components/StatCard';
-import FormPanel, { Field } from '@/components/FormPanel';
-import DeleteForm from '@/components/DeleteForm';
+import { Field } from '@/components/FormPanel';
+import FormModal from '@/components/FormModal';
+import ConfirmButton from '@/components/ConfirmButton';
 import { Link } from '@/i18n/navigation';
 import {
   createBusinessAction,
@@ -28,6 +29,22 @@ function dateInput(d: Date | null): string {
   return d ? new Date(d).toISOString().slice(0, 10) : '';
 }
 
+const CURRENCY_OPTIONS = (
+  <>
+    <option value="TRY">TRY ₺</option>
+    <option value="EUR">EUR €</option>
+    <option value="USD">USD $</option>
+    <option value="UAH">UAH ₴</option>
+  </>
+);
+const PLAN_OPTIONS = (
+  <>
+    <option value="trial">Trial</option>
+    <option value="standard">Standard</option>
+    <option value="premium">Premium</option>
+  </>
+);
+
 export default async function BusinessesPage({
   params
 }: {
@@ -40,15 +57,59 @@ export default async function BusinessesPage({
 
   const t = await getTranslations('business');
   const tc = await getTranslations('common');
+  const ta = await getTranslations('auth');
 
   const ov = await getOperatorOverview();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? '';
   const statusLabel = (s: BusinessStatus) =>
     s === 'ACTIVE' ? tc('active') : s === 'PASSIVE' ? t('passive') : t('expired');
 
+  const createForm = (
+    <FormModal
+      triggerLabel={t('new')}
+      triggerIcon="＋"
+      triggerClass="btn btn-primary"
+      title={t('new')}
+      submitLabel={tc('create')}
+      action={createBusinessAction}
+      maxWidth="max-w-2xl"
+    >
+      <Field label={t('name')}>
+        <input name="name" required className="input" />
+      </Field>
+      <Field label={t('slug')}>
+        <input name="slug" required className="input" placeholder="parlak-oto" />
+      </Field>
+      <Field label={t('city')}>
+        <input name="city" className="input" />
+      </Field>
+      <Field label={t('currency')}>
+        <select name="currency" className="input" defaultValue="TRY">
+          {CURRENCY_OPTIONS}
+        </select>
+      </Field>
+      <Field label={t('plan')}>
+        <select name="plan" className="input" defaultValue="standard">
+          {PLAN_OPTIONS}
+        </select>
+      </Field>
+      <Field label={t('subscriptionEnds')}>
+        <input name="subscriptionEndsAt" type="date" className="input" />
+      </Field>
+      <Field label={t('ownerName')}>
+        <input name="ownerName" required className="input" />
+      </Field>
+      <Field label={t('ownerEmail')}>
+        <input name="ownerEmail" type="email" required className="input" />
+      </Field>
+      <Field label={t('ownerPassword')} full>
+        <input name="ownerPassword" type="text" required minLength={6} className="input" />
+      </Field>
+    </FormModal>
+  );
+
   return (
     <div className="space-y-5">
-      <PageHeader title={t('title')} />
+      <PageHeader title={t('title')} action={createForm} />
 
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         <StatCard label={t('totalBusinesses')} value={ov.totalBusinesses} accent="brand" />
@@ -56,45 +117,6 @@ export default async function BusinessesPage({
         <StatCard label={t('expiringSoon')} value={ov.expiringSoon} accent={ov.expiringSoon ? 'red' : 'slate'} />
         <StatCard label={t('todayWashes')} value={ov.todayWashesTotal} />
       </div>
-
-      <FormPanel title={t('new')} action={createBusinessAction} submitLabel={tc('create')}>
-        <Field label={t('name')}>
-          <input name="name" required className="input" />
-        </Field>
-        <Field label={t('slug')}>
-          <input name="slug" required className="input" placeholder="parlak-oto" />
-        </Field>
-        <Field label={t('city')}>
-          <input name="city" className="input" />
-        </Field>
-        <Field label={t('currency')}>
-          <select name="currency" className="input" defaultValue="TRY">
-            <option value="TRY">TRY ₺</option>
-            <option value="EUR">EUR €</option>
-            <option value="USD">USD $</option>
-            <option value="UAH">UAH ₴</option>
-          </select>
-        </Field>
-        <Field label={t('plan')}>
-          <select name="plan" className="input" defaultValue="standard">
-            <option value="trial">Trial</option>
-            <option value="standard">Standard</option>
-            <option value="premium">Premium</option>
-          </select>
-        </Field>
-        <Field label={t('subscriptionEnds')}>
-          <input name="subscriptionEndsAt" type="date" className="input" />
-        </Field>
-        <Field label={t('ownerName')}>
-          <input name="ownerName" required className="input" />
-        </Field>
-        <Field label={t('ownerEmail')}>
-          <input name="ownerEmail" type="email" required className="input" />
-        </Field>
-        <Field label={t('ownerPassword')}>
-          <input name="ownerPassword" type="text" required minLength={6} className="input" />
-        </Field>
-      </FormPanel>
 
       <div className="card overflow-hidden">
         <table className="data">
@@ -116,41 +138,36 @@ export default async function BusinessesPage({
                 </td>
               </tr>
             )}
-            {ov.rows.map(({ business: b, status, ownerEmail, todayWashes, monthRevenue }) => {
-              const link = `${appUrl}/${locale}/book/${b.slug}`;
-              return (
-                <tr key={b.id}>
-                  <td>
-                    <div className="font-semibold">{b.name}</div>
-                    <div className="text-xs text-slate-500">{ownerEmail ?? '—'}</div>
-                    <a href={link} target="_blank" rel="noopener noreferrer" className="text-brand-600 text-xs underline">
-                      /{locale}/book/{b.slug}
-                    </a>
-                  </td>
-                  <td>
-                    <span className="badge" style={STATUS_STYLE[status]}>
-                      {statusLabel(status)}
-                    </span>
-                    <div className="text-xs text-slate-400 mt-1 capitalize">{b.plan}</div>
-                  </td>
-                  <td className="whitespace-nowrap">
-                    {b.subscriptionEndsAt ? formatDate(b.subscriptionEndsAt, locale) : t('unlimited')}
-                  </td>
-                  <td className="font-semibold">{todayWashes}</td>
-                  <td className="font-medium">{formatMoney(monthRevenue, b.currency, locale)}</td>
-                  <td className="text-right whitespace-nowrap space-x-1">
-                    <Link href={`/businesses/${b.id}`} className="btn btn-ghost" style={{ padding: '0.3rem 0.6rem' }}>
-                      {t('detail')}
+            {ov.rows.map(({ business: b, status, ownerEmail, todayWashes, monthRevenue }) => (
+              <tr key={b.id}>
+                <td>
+                  <div className="font-semibold">{b.name}</div>
+                  <div className="text-xs text-slate-500">{ownerEmail ?? '—'}</div>
+                </td>
+                <td>
+                  <span className="badge" style={STATUS_STYLE[status]}>
+                    {statusLabel(status)}
+                  </span>
+                  <div className="text-xs text-slate-400 mt-1 capitalize">{b.plan}</div>
+                </td>
+                <td className="whitespace-nowrap">
+                  {b.subscriptionEndsAt ? formatDate(b.subscriptionEndsAt, locale) : t('unlimited')}
+                </td>
+                <td className="font-semibold">{todayWashes}</td>
+                <td className="font-medium">{formatMoney(monthRevenue, b.currency, locale)}</td>
+                <td>
+                  <div className="action-group">
+                    <Link href={`/businesses/${b.id}`} className="btn btn-ghost btn-sm">
+                      <span aria-hidden>▤</span> {t('detail')}
                     </Link>
-                    <form action={toggleBusinessActiveAction} style={{ display: 'inline' }}>
-                      <input type="hidden" name="id" value={b.id} />
-                      <button className="btn btn-ghost" style={{ padding: '0.3rem 0.6rem' }}>
-                        {b.isActive ? t('deactivate') : t('activate')}
-                      </button>
-                    </form>
 
-                    {/* Edit */}
-                    <FormPanel title={tc('edit')} action={updateBusinessAction} submitLabel={tc('update')} compact>
+                    <FormModal
+                      triggerLabel={tc('edit')}
+                      triggerIcon="✎"
+                      title={`${tc('edit')} — ${b.name}`}
+                      submitLabel={tc('update')}
+                      action={updateBusinessAction}
+                    >
                       <input type="hidden" name="id" value={b.id} />
                       <Field label={t('name')}>
                         <input name="name" required defaultValue={b.name} className="input" />
@@ -163,43 +180,71 @@ export default async function BusinessesPage({
                       </Field>
                       <Field label={t('currency')}>
                         <select name="currency" className="input" defaultValue={b.currency}>
-                          <option value="TRY">TRY ₺</option>
-                          <option value="EUR">EUR €</option>
-                          <option value="USD">USD $</option>
-                          <option value="UAH">UAH ₴</option>
+                          {CURRENCY_OPTIONS}
                         </select>
                       </Field>
-                      <Field label={t('plan')}>
+                      <Field label={t('plan')} full>
                         <select name="plan" className="input" defaultValue={b.plan}>
-                          <option value="trial">Trial</option>
-                          <option value="standard">Standard</option>
-                          <option value="premium">Premium</option>
+                          {PLAN_OPTIONS}
                         </select>
                       </Field>
-                    </FormPanel>
+                    </FormModal>
 
-                    {/* Subscription */}
-                    <FormPanel title={t('subscription')} action={setSubscriptionAction} submitLabel={tc('save')} compact>
+                    <FormModal
+                      triggerLabel={t('subscription')}
+                      triggerIcon="⏳"
+                      title={`${t('subscription')} — ${b.name}`}
+                      submitLabel={tc('save')}
+                      action={setSubscriptionAction}
+                      maxWidth="max-w-md"
+                    >
                       <input type="hidden" name="id" value={b.id} />
                       <Field label={t('subscriptionEnds')} full>
                         <input name="subscriptionEndsAt" type="date" defaultValue={dateInput(b.subscriptionEndsAt)} className="input" />
                       </Field>
                       <p className="sm:col-span-2 text-xs text-slate-400">{t('unlimitedHint')}</p>
-                    </FormPanel>
+                    </FormModal>
 
-                    {/* Reset owner password */}
-                    <FormPanel title={t('resetOwnerPassword')} action={resetOwnerPasswordAction} submitLabel={tc('save')} compact>
+                    <FormModal
+                      triggerLabel={ta('password')}
+                      triggerIcon="🔑"
+                      title={`${t('resetOwnerPassword')} — ${b.name}`}
+                      submitLabel={tc('save')}
+                      action={resetOwnerPasswordAction}
+                      maxWidth="max-w-md"
+                    >
                       <input type="hidden" name="id" value={b.id} />
                       <Field label={t('newPassword')} full>
                         <input name="newPassword" type="text" required minLength={6} className="input" />
                       </Field>
-                    </FormPanel>
+                    </FormModal>
 
-                    <DeleteForm action={deleteBusinessAction} id={b.id} />
-                  </td>
-                </tr>
-              );
-            })}
+                    <ConfirmButton
+                      triggerLabel={b.isActive ? t('deactivate') : t('activate')}
+                      triggerIcon="⏻"
+                      title={b.isActive ? t('deactivate') : t('activate')}
+                      message={b.isActive ? t('confirmDeactivate') : t('confirmActivate')}
+                      confirmLabel={b.isActive ? t('deactivate') : t('activate')}
+                      confirmClass={b.isActive ? 'btn btn-danger-solid' : 'btn btn-primary'}
+                      action={toggleBusinessActiveAction}
+                      fields={{ id: b.id }}
+                    />
+
+                    <ConfirmButton
+                      triggerLabel={tc('delete')}
+                      triggerIcon="🗑"
+                      triggerClass="btn btn-danger btn-sm"
+                      title={`${tc('delete')} — ${b.name}`}
+                      message={t('confirmDelete')}
+                      confirmLabel={tc('delete')}
+                      confirmClass="btn btn-danger-solid"
+                      action={deleteBusinessAction}
+                      fields={{ id: b.id }}
+                    />
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

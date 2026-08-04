@@ -13,6 +13,9 @@
     "loading": "Cargando...",
     "noData": "No se encontraron registros",
     "confirmDelete": "¿Seguro que deseas eliminar este registro?",
+    "confirm": "Confirmar",
+    "confirmSave": "¿Seguro que deseas guardar estos cambios?",
+    "error": "La operación falló",
     "back": "Atrás",
     "all": "Todos",
     "yes": "Sí",
@@ -206,7 +209,10 @@
     "expiringSoon": "Caduca pronto",
     "byBusiness": "Por negocio",
     "detail": "Detalles",
-    "totalAppointments": "Citas totales"
+    "totalAppointments": "Citas totales",
+    "confirmActivate": "¿Activar este negocio?",
+    "confirmDeactivate": "¿Desactivar este negocio? Su propietario y personal no podrán iniciar sesión.",
+    "confirmDelete": "¿Eliminar permanentemente este negocio y todos sus datos? No se puede deshacer."
   },
   "booking": {
     "title": "Reserva Online",

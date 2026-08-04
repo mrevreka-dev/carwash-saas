@@ -13,6 +13,9 @@
     "loading": "Loading...",
     "noData": "No records found",
     "confirmDelete": "Are you sure you want to delete this record?",
+    "confirm": "Confirm",
+    "confirmSave": "Are you sure you want to save these changes?",
+    "error": "The operation failed",
     "back": "Back",
     "all": "All",
     "yes": "Yes",
@@ -206,7 +209,10 @@
     "expiringSoon": "Expiring soon",
     "byBusiness": "By business",
     "detail": "Details",
-    "totalAppointments": "Total appointments"
+    "totalAppointments": "Total appointments",
+    "confirmActivate": "Activate this business?",
+    "confirmDeactivate": "Deactivate this business? Its owner and staff won't be able to sign in.",
+    "confirmDelete": "Permanently delete this business and all its data? This cannot be undone."
   },
   "booking": {
     "title": "Online Booking",

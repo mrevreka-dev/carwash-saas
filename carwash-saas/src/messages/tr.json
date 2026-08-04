@@ -13,6 +13,9 @@
     "loading": "Yükleniyor...",
     "noData": "Kayıt bulunamadı",
     "confirmDelete": "Bu kaydı silmek istediğinize emin misiniz?",
+    "confirm": "Onayla",
+    "confirmSave": "Bu değişiklikleri kaydetmek istediğinize emin misiniz?",
+    "error": "İşlem başarısız oldu",
     "back": "Geri",
     "all": "Tümü",
     "yes": "Evet",
@@ -206,7 +209,10 @@
     "expiringSoon": "Süresi yakında dolacak",
     "byBusiness": "İşletme bazında",
     "detail": "Detay",
-    "totalAppointments": "Toplam randevu"
+    "totalAppointments": "Toplam randevu",
+    "confirmActivate": "Bu işletmeyi aktifleştirmek istiyor musunuz?",
+    "confirmDeactivate": "Bu işletmeyi pasifleştirmek istiyor musunuz? Sahibi ve personeli giriş yapamayacak.",
+    "confirmDelete": "Bu işletmeyi ve tüm verilerini kalıcı olarak silmek istiyor musunuz? Bu işlem geri alınamaz."
   },
   "booking": {
     "title": "Online Randevu",

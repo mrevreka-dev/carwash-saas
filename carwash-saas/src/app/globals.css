@@ -87,6 +87,31 @@ body {
 .btn-danger:hover {
   background: #fef2f2;
 }
+.btn-danger-solid {
+  background: #dc2626;
+  color: #fff;
+}
+.btn-danger-solid:hover {
+  background: #b91c1c;
+}
+.btn-sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  border-radius: 0.45rem;
+}
+.btn-sm span {
+  font-size: 0.85rem;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.action-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
 .card {
   background: #fff;
   border: 1px solid #e6eaf2;
